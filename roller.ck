@@ -1,16 +1,11 @@
+int runLength;
+
 fun int oneDsix() {
 	return Math.random2(0,5);
 }
 
 fun int twoDsix() {
 	return oneDsix() + oneDsix();
-}
-
-fun void piece(int pieceLength) {
-	spork ~ pulse();
-	// spork voices;
-	pieceLength::second +=> now;
-	return;
 }
 
 fun void pulse() {
@@ -23,12 +18,24 @@ fun void pulse() {
 		Math.random2f( 0.2, 0.6 ) => modey.strike;
 		((oneDsix()+1)/3.0)-1.0  => panner.pan;
 		(1/6.0)::second +=> now;
+		if (runLength == 0) {
+			5::second +=> now;
+			me.exit();
+		}
 	}
 }
 
-int runLength;
 1+ oneDsix() => runLength;;
 <<< "Length: ", runLength >>>;
 
-piece((1+ oneDsix()) * 60);
+spork ~ pulse();
+runLength * 60 => runLength;
 
+while (runLength > 0) {
+		<<< runLength >>>;
+		1 -=> runLength;
+		1::second +=> now;
+}
+
+// Make sure last note reverb trails off.
+5::second => now;
