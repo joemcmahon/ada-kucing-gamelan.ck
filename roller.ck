@@ -11,7 +11,7 @@ fun int twoDsix() {
 fun void pulse() {
 	ModalBar modey => PRCRev r => Pan2 panner => dac;
   0.2 => r.mix;
-	Std.mtof(45) => modey.freq;
+	Std.mtof(60) => modey.freq;
 	while (1) {
 		oneDsix() => modey.preset;
 		Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
