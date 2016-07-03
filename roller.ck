@@ -46,6 +46,7 @@ fun void pulse() {
 		Math.random2f( 0.2, 0.6 ) => modey.strike;
 		(oneDsix()/3.0)-1.0  => panner.pan;
 		(1/6.0)::second +=> now;
+		me.yield();
 		if (runLength == 0) {
 			5::second +=> now;
 			me.exit();
@@ -98,23 +99,23 @@ fun void playLayer(int layerType, int pitchSet) {
 	// it exits.
 
 	// Pick a random order to select the pitches from the pitchset with.
+	time started;
+	now => started;
+
+	me.yield();
 	int pitchIndices[];
 	permutesix() @=> pitchIndices;
 
 	// Pick a number of notes this layer will play.
 	int totalNotes;
 	6 => totalNotes;
-	<<< "Playing ", totalNotes >>>;
+	<<< started, "launched ", layerType >>>;
 
 	// Select the notes from the predetermined pitchset.
 	int notes[];
 	[0, 0, 0, 0, 0, 0] @=> notes;
 	int i;
-	<<< "Pitchset ", pitchSet >>>;
 	for ( 0 => i; i < totalNotes; 1 +=> i) {
-		<<< "Note #", i >>>;
-		<<< "index ", pitchIndices[i]-1 >>>;
-		<<< "Actual note ",  pitchSets[pitchSet][pitchIndices[i]] >>>;
 		pitchSets[pitchSet][pitchIndices[i]] => notes[i];
 		<<< "Note ", i, ": ", notes[i] >>>;
 	}
@@ -151,18 +152,14 @@ fun void playLayer(int layerType, int pitchSet) {
 		[ 0, 0, 0]
 	] @=> schedule;
 	int unscheduledNotes;
-	totalNotes => unscheduledNotes;
+	int lastSchedulePoint;
+	sectionLength * 6 => lastSchedulePoint;
 	for ( totalNotes-1 => i; i >= 0; 1 -=> i) {
-		<<< "scheduling note", i >>>;
-		int startPoint;
-		Math.random2(unscheduledNotes, sectionLength * 6) => startPoint;
-		<<< "start point", startPoint >>>;
+		Math.random2(0, lastSchedulePoint) => lastSchedulePoint;;
 		int duration;
 		32 => duration;
-		<<< duration, "ticks" >>>;
-		[startPoint, notes[i], duration] @=> schedule[i];
+		[lastSchedulePoint / 6, notes[i], duration] @=> schedule[i];
 	}
-	<<< "schedule completed" >>>;
 
 	// Play the schedule, then exit.
 	ModalBar modey => PRCRev r => Pan2 panner => dac;
@@ -170,24 +167,20 @@ fun void playLayer(int layerType, int pitchSet) {
 	oneDsix() => modey.preset;
 	(oneDsix()/3.0)-1.0  => panner.pan;
 
+	<<< started, "layer ", layerType, " ready" >>>;
 	int currentOffset;
 	0 => currentOffset;
 	for (0 => i; i < totalNotes; 1 +=> i) {
-		<<< "Note ", i >>>;
 		// Skip to start offset if needed
 		if (schedule[i][0] > currentOffset) {
-			<<< "skip to ", schedule[i][0] >>>;
-			(1/6.0)::second * schedule[i][0] +=> now;
+			 schedule[i][0]::second +=> now;
 		}
-		<<< "play ", schedule[i][1] >>>;
+		<<< started, layerType, "play ", schedule[i][1] >>>;
 		Std.mtof(schedule[i][1]) => modey.freq;
 		Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
 		1.0 => modey.strike;
-		// Continue playing to end of interval
-		<<< "sustain to ", schedule[i][2] >>>;
-    schedule[i][2] * (1/6.0)::second +=> now;
 	}
-	<<< "layer ", layerType, " stopping" >>>;
+	<<< started, "layer ", layerType, " stopping" >>>;
 }
 
 // Make sure last note reverb trails off.
