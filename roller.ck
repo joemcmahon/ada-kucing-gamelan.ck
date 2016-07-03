@@ -75,17 +75,19 @@ while (runLength > 0) {
 			<<< "Section ", sections >>>;
 			 oneDsix() => layers;
 			<<< layers, " layers this section" >>>;
+			int rolls[];
+			permutesix() @=> rolls;
       int i;
 			for (1 => i; i <= layers; 1 +=> i) {
 				// generate notes and durations for this layer
-				spork ~ playLayer(i);
+				spork ~ playLayer(i, rolls[i]);
 			}
 		}
 		1 -=> runLength;
 		1::second +=> now;
 }
 
-fun void playLayer(int layerType) {
+fun void playLayer(int layerType, int pitchSet) {
 	// each layer plays from 1 to 6 notes.
 	// The notes are selected from one of six scales, chosen
 	// by evaluating the global timestamp modulo 6, and the
@@ -93,7 +95,30 @@ fun void playLayer(int layerType) {
 	// d6 roll. The sustain is chosen randomly as well, based
 	// on the sectionLength. When this layer runs out of notes,
 	// it exits.
+
+	// Pick a random order to select the pitches from the pitchset with.
+	int pitchIndices[];
+	permutesix() @=> pitchIndices;
+
+	// Pick a number of notes this layer will play.
+	int totalNotes;
+	oneDsix() => totalNotes;
+	<<< "Playing ", totalNotes >>>;
+
+	// Select the notes from the predetermined pitchset.
+	int notes[];
+	[0, 0, 0, 0, 0, 0] @=> notes;
+	int i;
+	<<< "Pitchset ", pitchSet >>>;
+	for ( 0 => i; i < totalNotes; 1 +=> i) {
+		<<< "Note #", i >>>;
+		<<< "index ", pitchIndices[i] >>>;
+		<<< "Actual note ",  pitchSets[pitchSet][pitchIndices[i]] >>>;
+		pitchSets[pitchSet][pitchIndices[i]] => notes[i];
+		<<< "Note ", i, ": ", notes[i] >>>;
+	}
 	<<< "layer ", layerType, " starting" >>>;
+	
 	sectionLength::second => now;
 	<<< "layer ", layerType, " stopping" >>>;
 }
