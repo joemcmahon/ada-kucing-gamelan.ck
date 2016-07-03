@@ -35,29 +35,9 @@ fun int[] permutesix() {
 	return permutation;
 }
 
-fun void pulse() {
-	ModalBar modey => PRCRev r => Pan2 panner => dac;
-  0.2 => r.mix;
-	0.75 => dac.gain;
-	Std.mtof(60) => modey.freq;
-	while (1) {
-		oneDsix() => modey.preset;
-		Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
-		Math.random2f( 0.2, 0.6 ) => modey.strike;
-		(oneDsix()/3.0)-1.0  => panner.pan;
-		(1/6.0)::second +=> now;
-		me.yield();
-		if (runLength == 0) {
-			5::second +=> now;
-			me.exit();
-		}
-	}
-}
-
 oneDsix() => runLength;;
 <<< "Length: ", runLength >>>;
 
-spork ~ pulse();
 runLength * 60 => runLength;
 
 int sections, sectionLength, layers;

@@ -20,6 +20,6 @@ six-layer version.
 
 ## Recommended performance
 
-chuck roller.ck roller.ck roller.ck roller.ck roller.ck roller.ck
+chuck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck pulse.ck
 
 
