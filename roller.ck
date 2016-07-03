@@ -1,11 +1,38 @@
 int runLength;
 
+// Pitchsets; note that the lower pitches are 
+// duplicated to prevent low-interval clashes if
+// we get all six layers at once.
+[
+	[ 96, 98, 100, 102, 105, 107],
+	[ 84, 86, 88, 90, 93, 95 ],
+	[ 72, 74, 76, 78, 81, 83 ],
+	[ 60, 62, 64, 66, 69, 71 ],
+	[ 54, 54, 54, 57, 59, 62],
+	[ 36, 36, 47, 47, 50, 50]
+] @=> int pitchSets[][];
+
 fun int oneDsix() {
 	return 1 + Math.random2(0,5);
 }
 
 fun int twoDsix() {
 	return oneDsix() + oneDsix();
+}
+
+fun int[] permutesix() {
+	int permutation[];
+	[1, 2, 3, 4, 5, 6] @=>permutation;
+	int i;
+	for (0 => i; i < permutation.cap()-2; 1 +=> i) {
+		int j;
+		Math.random2(0, permutation.cap() - i - 1) => j;
+		int t;
+		permutation[i] => t;
+		permutation[j] => permutation[i];
+		t => permutation[j];
+	}
+	return permutation;
 }
 
 fun void pulse() {
