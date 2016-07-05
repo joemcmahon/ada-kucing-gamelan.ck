@@ -4,10 +4,10 @@ int runLength;
 // duplicated to prevent low-interval clashes if
 // we get all six layers at once.
 [
+	[ 108, 110, 112, 114, 117, 119],
 	[ 96, 98, 100, 102, 105, 107],
 	[ 84, 86, 88, 90, 93, 95 ],
 	[ 72, 74, 76, 78, 81, 83 ],
-	[ 60, 62, 64, 66, 69, 71 ],
 	[ 54, 54, 54, 57, 59, 62],
 	[ 36, 36, 47, 47, 50, 50]
 ] @=> int pitchSets[][];
@@ -142,26 +142,30 @@ fun void playLayer(int layerType, int pitchSet) {
 	}
 
 	// Play the schedule, then exit.
-	ModalBar modey => PRCRev r => Pan2 panner => dac;
-	0.75 =>modey.gain;
+	<<< started, "layer ", layerType, " ready" >>>;
+	for (0 => i; i < totalNotes; 1 +=> i) {
+		<<< "schedule ", i, schedule[i][0], schedule[i][1], schedule[i][2] >>>;
+		playUnpulsed(started, i, schedule[i]);
+	}
+}
+
+fun void playUnpulsed(time started, int i, int items[]) {
+	<<< "playing unpulsed", started, i >>>;
+	ModalBar modey => PRCRev r => Pan2 panner => Gain g => dac;
+	0.75 => modey.gain;
+	
   0.2 => r.mix;
 	oneDsix() => modey.preset;
 	(oneDsix()/3.0)-1.0  => panner.pan;
-
-	<<< started, "layer ", layerType, " ready" >>>;
-	int currentOffset;
-	0 => currentOffset;
-	for (0 => i; i < totalNotes; 1 +=> i) {
-		// Skip to start offset if needed
-		if (schedule[i][0] > currentOffset) {
-			 schedule[i][0]::second +=> now;
-		}
-		<<< started, layerType, "play ", schedule[i][1] >>>;
-		Std.mtof(schedule[i][1]) => modey.freq;
-		Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
-		1.0 => modey.strike;
-	}
-	<<< started, "layer ", layerType, " stopping" >>>;
+	<<< "start in ", items[0] >>>;
+	items[0]::second +=> now;
+	Std.mtof(items[1]) => modey.freq;
+	Math.random2f( 0.2, 0.8 ) => modey.strikePosition;
+	<<< "play ", items[1] >>>;
+	1.0 => modey.strike;
+	items[2]::second +=> now;
+	<<< "played" >>>;
+	me.exit();
 }
 
 // Make sure last note reverb trails off.
