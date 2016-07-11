@@ -20,6 +20,6 @@ six-layer version.
 
 ## Recommended performance
 
-chuck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck pulse.ck
+chuck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck nopulse.ck pulse.ck rec-auto-stereo.ck
 
 
